@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            html {
+                background: #333;
+            }
+        </style>
+        <script src="lib.js"></script>
+        <script>
+            const input = {}; // day_number -> input as string
+            const solutions = {}; // [day_number][part_number] -> (input) => solution function
+            for (let i = 1; i < 26; i++) { solutions[i] = {}; }
+        </script>
+<script src="day/1/input.js"></script>
+    </head>
+    <body>
+<script src="day/1/p1.js"></script>
+<script src="day/1/p2.js"></script>
+        <script>
+            const DAY = 1; 
+            const PART = 2;
+            solutions[DAY][PART](input[DAY]);
+        </script>
+    </body>
+</html>
