@@ -9,4 +9,4 @@ Run `npm run make [day_number]` to pull a given days input, generate template so
 # Requirements
 
 - `.env` file with `YEAR`, `SESSION`, and `SECRET_KEY`.
-- `.env.js` file with `SECRET_KEY`.
+- `env.js` file with `SECRET_KEY`.
