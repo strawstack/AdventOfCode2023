@@ -1,6 +1,7 @@
 import fs from 'fs';
 import fetch from 'node-fetch';
 import { config } from 'dotenv';
+import CryptoJS from 'crypto-js';
 config();
 
 // Create 'day/day_number' directory
@@ -110,12 +111,24 @@ export async function pullInputFile(day_number) {
 }
 
 export function generateInputFile(inputContent, day_number) {
-    // Regenerate html file to contain
-    // import lines for all existing days
-    const content = `(() => { input[${day_number}] = \`${inputContent}\`; })()`;
-    fs.writeFile(`day/${day_number}/input.js`, content, err => {
-        if (err) {
-            console.error(err);
-        }
+    var encrypted_input = CryptoJS.AES.encrypt(
+        JSON.stringify(inputContent), process.env.SECRET_KEY
+    ).toString();
+
+    fs.readFile('template/input.js', 'utf8', (err, data) => {
+        const content = data
+            .replace(
+                "DAY_NUMBER",
+                day_number
+
+            ).replace(
+                "ENCRYPTED_INPUT",
+                encrypted_input
+            );
+        fs.writeFile(`day/${day_number}/input.js`, content, err => {
+            if (err) {
+                console.error(err);
+            }
+        });
     });
 }
