@@ -1,8 +1,7 @@
 (() => {
 
     function sol(input) {
-        let data = input.split("\n");
-        data.pop();
+        let data = input.trim().split("\n");
         return data;
     }
 
