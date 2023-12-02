@@ -8,4 +8,5 @@ Run `npm run make [day_number]` to pull a given days input, generate template so
 
 # Requirements
 
-NodeJS must be installed. You'll need a .env file in the project root specifying `YEAR`, `SESSION`, and `SECRET_KEY`.
+- `.env` file with `YEAR`, `SESSION`, and `SECRET_KEY`.
+- `.env.js` file with `SECRET_KEY`.
