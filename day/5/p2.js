@@ -7,63 +7,68 @@
     function applyMap(ranges, map) {
 
         const map_ranges = map.ranges.sort((a, b) => a.source - b.source);
-
-        if (map.source === "temperature") {
-            debugger
-        } 
         
         const dest_ranges = [];
         for (let {source: a, length: range_length} of ranges) {
+            
+            const b = a + range_length - 1;
+            let special = true;
 
             for (let {dest, source: c, length: map_length} of map_ranges) {
 
-                const b = a + range_length - 1;
                 const d = c + map_length - 1;
 
                 // a---b
                 //       c---d
                 if (b < c) {
                     dest_ranges.push({source: a, length: range_length});
+                    special = false;
                     break;
 
                 // a---b
                 //    c---d
                 } else if (a < c && b >= c && b < d) {
-                    dest_ranges.push({source: a, length: c - a - 1});
-                    dest_ranges.push({source: dest, length: b - c});
+                    dest_ranges.push({source: a, length: c - a});
+                    dest_ranges.push({source: dest, length: b - c + 1});
+                    special = false;
                     break;
 
                 // a-------b
                 //   c---d
                 } else if (a < c && b > d) {
-                    dest_ranges.push({source: a, length: c - a - 1});
+                    dest_ranges.push({source: a, length: c - a});
                     dest_ranges.push({source: dest, length: map_length});
                     for (let res of applyMap([{source: d + 1, length: b - d}], map)) {
                         dest_ranges.push(res);
                     }
+                    special = false;
                     break;
 
                 //   a---b
                 // c-------d
                 } else if (a >= c && b <= d) {
                     dest_ranges.push({source: dest + a - c, length: range_length});
+                    special = false;
                     break;
 
                 //   a---b
                 // c---d
                 } else if (a >= c && a <= d && b > d) {
-                    dest_ranges.push({source: dest + a - c, length: map_length - (a - c)});
+                    dest_ranges.push({source: dest + a - c, length: d - a + 1});
                     for (let res of applyMap([{source: d + 1, length: b - d}], map)) {
                         dest_ranges.push(res);
                     }
+                    special = false;
                     break;
                 }
             }
             
             // range is fully outside last map interval
-            const last_map = map_ranges[map_ranges.length - 1];
-            if (a > last_map.source) {
-                dest_ranges.push({source: a, length: range_length});
+            if (special) {
+                const last_map = map_ranges[map_ranges.length - 1];
+                if (a > last_map.source) {
+                    dest_ranges.push({source: a, length: range_length});
+                }
             }
         }
 
@@ -167,10 +172,12 @@ humidity-to-location map:
 `;
 
     function main(input) {
+        const start = Date.now();
         console.log(
-            //sol(input)
-            sol(test_input)
+            sol(input)
+            //sol(test_input)
         );
+        console.log(Date.now() - start);
     }
 
     const DAY = 5;
