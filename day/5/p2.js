@@ -5,31 +5,77 @@
     // Convert each range using information in map
     // Returns: ranges converted to destination space
     function applyMap(ranges, map) {
+
         const map_ranges = map.ranges.sort((a, b) => a.source - b.source);
 
+        if (map.source === "temperature") {
+            debugger
+        } 
+        
         const dest_ranges = [];
-        for (let range of ranges) {
-            // TODO
-            // special case: is range source < first map_range.source
-            // for each map_range convert a piece of range
-            // update range.source value and pay attention to range.source + range.length  
+        for (let {source: a, length: range_length} of ranges) {
+
+            for (let {dest, source: c, length: map_length} of map_ranges) {
+
+                const b = a + range_length - 1;
+                const d = c + map_length - 1;
+
+                // a---b
+                //       c---d
+                if (b < c) {
+                    dest_ranges.push({source: a, length: range_length});
+                    break;
+
+                // a---b
+                //    c---d
+                } else if (a < c && b >= c && b < d) {
+                    dest_ranges.push({source: a, length: c - a - 1});
+                    dest_ranges.push({source: dest, length: b - c});
+                    break;
+
+                // a-------b
+                //   c---d
+                } else if (a < c && b > d) {
+                    dest_ranges.push({source: a, length: c - a - 1});
+                    dest_ranges.push({source: dest, length: map_length});
+                    for (let res of applyMap([{source: d + 1, length: b - d}], map)) {
+                        dest_ranges.push(res);
+                    }
+                    break;
+
+                //   a---b
+                // c-------d
+                } else if (a >= c && b <= d) {
+                    dest_ranges.push({source: dest + a - c, length: range_length});
+                    break;
+
+                //   a---b
+                // c---d
+                } else if (a >= c && a <= d && b > d) {
+                    dest_ranges.push({source: dest + a - c, length: map_length - (a - c)});
+                    for (let res of applyMap([{source: d + 1, length: b - d}], map)) {
+                        dest_ranges.push(res);
+                    }
+                    break;
+                }
+            }
+            
+            // range is fully outside last map interval
+            const last_map = map_ranges[map_ranges.length - 1];
+            if (a > last_map.source) {
+                dest_ranges.push({source: a, length: range_length});
+            }
         }
 
         return dest_ranges;
     }
 
     function getLocations({seed_data, maps}) {
-        let locations = [];
-        for (let range of seed_data) {
-            let ranges = [range];
-            for (let map of maps) {
-                ranges = applyMap(ranges, map);
-            }
-            for (let range of ranges) {
-                locations.push(range);
-            }
+        let ranges = seed_data;
+        for (let map of maps) {
+            ranges = applyMap(ranges, map);
         }
-        return locations;
+        return ranges;
     }
 
     function sol(input) {
@@ -81,7 +127,8 @@
 
         const locations = getLocations({seed_data, maps});
 
-        return locations.reduce((a, c) => a.source < c.source ? a.source : c.source);
+        return locations.map(e => e.source)
+            .reduce((a, c) => a < c ? a : c);
     }
 
     const test_input = `seeds: 79 14 55 13
@@ -121,8 +168,8 @@ humidity-to-location map:
 
     function main(input) {
         console.log(
-            sol(input)
-            //sol(test_input)
+            //sol(input)
+            sol(test_input)
         );
     }
 
