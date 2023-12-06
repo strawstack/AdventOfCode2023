@@ -177,7 +177,7 @@ humidity-to-location map:
             sol(input)
             //sol(test_input)
         );
-        console.log(Date.now() - start);
+        //console.log(Date.now() - start);
     }
 
     const DAY = 5;
