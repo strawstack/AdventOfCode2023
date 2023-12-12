@@ -9,20 +9,6 @@
 
     let cache = {};
 
-    function shouldCull(record_index, record, chunk_index, chunks) {
-        let total_broken = 0;
-        for (let i = record_index; i < record.length; i++) {
-            if(record[i] === "#" || record[i] === "?") {
-                total_broken += 1;
-            }
-        }
-        let total_chunk = 0;
-        for (let i = chunk_index; i < chunks.length; i++) {
-            total_chunk += chunks[i];
-        }
-        return total_broken < total_chunk;
-    }
-
     function verify_record(record, from_index, to_index) {
 
         if (to_index >= record.length) return false;
@@ -47,11 +33,6 @@
         if (r_done) {
             return c_done ? 1 : 0;
         }
-
-        /*
-        if (shouldCull(record_index, record, chunk_index, chunks)) {
-            return 0;
-        } */
 
         if (record_value === ".") {
             const hh = hash(record_index + 1, chunk_index);
