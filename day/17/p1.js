@@ -25,127 +25,86 @@
             };
         };
 
+        const eq = (a, b) => {
+            return a.x === b.x && a.y === b.y;
+        };
+
         // Given direction returns next options
-        const opts = (dir, limit) => {
-            const dirs = [];
-            dirs.push( (dir + 1) % 4 );
+        const opts = dir => {
+            const right = (dir + 1) % 4;
             const v = (dir - 1) % 4;
-            dirs.push( v < 0 ? v + 4 : v );
-            if (limit > 0) {
-                dirs.push(dir);
+            const left = v < 0 ? v + 4 : v;
+            return [dir, right, left];
+        };
+
+        const inPath = (new_coord, lst) => {
+            for (let { coord } of lst) {
+                if (eq(coord, new_coord)) return true;
             }
-            return dirs;
+            return false;
         };
 
         const hash = coord => JSON.stringify(coord);
-        
-        // Given cell and direction provides cached answer
-        // {hash(coord) -> {dir -> answer}}
-        const ans_lookup = {};
-        for (let y = 0; y < grid.length; y++) {
-            for (let x = 0; x < grid[0].length; x++) {
-                ans_lookup[hash({x, y})] = {};
-            }
-        }
-        
-        const path_lookup = {};
+
+        const done = {};
+
+        const lookup = {};
+
+        let best = Infinity;
 
         const lst = [{
             coord: {x: 0, y: 0},
-            dir: 1, // 0: up, 1: right, 2: down, 3: left
-            limit: LIMIT_VALUE
+            dir: null
         }];
 
         while (lst.length > 0) {
-            const { coord, dir, limit } = lst[lst.length - 1];
-            const hc = hash(coord);
-            path_lookup[hc] = true;
+            const { coord, dir } = lst[lst.length - 1];
+            const ph = lst.length > 1 ? hash(lst[lst.length - 2].coord) : "null_hash";
+            const hh = hash(coord);
 
-            if (lst.length === 1) {
+            // Target cell found
+            if (coord.y === grid.length - 1 && coord.x === grid[0].length - 1) {
+                const value = lst.reduce((a, c) => a + grid[c.coord.y][c.coord.x], 0);
+                best = Math.min(best, value);
                 
-                let child_call = false;
-                for (let opt of opts(dir, limit)) {
-                    if (opt in ans_lookup[hc]) continue;
-                    const nx_coord = add(coord, delta[opt]);
-                    lst.push({
-                        coord: nx_coord,
-                        dir: opt,
-                        limit: limit - 1
-                    });
-                    child_call = true;
-                    break;
-                }
-
-                if (child_call) continue;
-                lst.pop(); // final return
-                
-            } else {
-                const ph = hash(lst[lst.length - 2].coord);
-
-                if (!inBounds(coord)) {
-                    ans_lookup[ph][dir] = Infinity;
-                    lst.pop();
-                    delete path_lookup[hc];
-                    delete path_lookup[ph];
-                    continue;
-                }
-
-                // Bottom right is reached
-                if (coord.y === grid.length - 1 && coord.x === grid[0].length - 1) {
-                    ans_lookup[ph][dir] = grid[coord.y][coord.x];
-                    
-                    lst.pop();
-                    delete path_lookup[hc];
-                    delete path_lookup[ph];
-                    continue;
-                }
-    
-                if (limit === LIMIT_VALUE) {
-                    if (hc in ans_lookup && dir in ans_lookup[hc]) {
-                        ans_lookup[ph][dir] = ans_lookup[hc][dir];
-                        lst.pop();
-                        delete path_lookup[hc];
-                        delete path_lookup[ph];
-                        continue;
-                    }
-                }
-
-                let child_call = false;
-                for (let opt of opts(dir, limit)) {
-                    if (opt in ans_lookup[hc]) continue;
-
-                    const nx_coord = add(coord, delta[opt]);
-                    if (hash(nx_coord) in path_lookup) continue;
-
-                    const new_limit = limit === 0 || dir !== opt ? LIMIT_VALUE : limit - 1;
-                    lst.push({
-                        coord: nx_coord,
-                        dir: opt,
-                        limit: new_limit
-                    });
-                    child_call = true;
-                    break;
-                }
-
-                if (child_call) continue;
-
-                const values = Object.values(ans_lookup[hc]);
-                if (values.length > 0) {
-                    const ans = values.reduce((a, c) => a < c ? a : c) + grid[coord.y][coord.x];
-                    ans_lookup[ph][dir] = ans;
-                } else {
-                    ans_lookup[ph][dir] = Infinity;
-                }
-                lst.pop();
-                delete path_lookup[hc];
-                delete path_lookup[ph];
+                // Return to parent
+                if (!(ph in done)) done[ph] = {};
+                done[ph][dir] = true; 
+                lst.pop(); break;
             }
+
+            // Visit adj cells
+            let child_call = false;
+            for (let i = 0; i < 4; i++) {
+                const new_coord = add(coord, delta[i]);
+
+                if (!inBounds(new_coord)) continue;
+                if (!(hh in done)) done[hh] = {};
+                if (i in done[hh]) continue;
+                if (inPath(new_coord, lst)) continue;
+
+                if (hash(new_coord) in lookup) {
+                    const value = lst.reduce((a, c) => a + grid[c.coord.y][c.coord.x], 0) + lookup[hash(new_coord)];
+                    best = Math.min(best, value);
+
+                    // Return to parent
+                    if (!(ph in done)) done[ph] = {};
+                    done[ph][dir] = true; 
+                    lst.pop(); break;
+                }
+
+                child_call = true;
+                lst.push({
+                    coord: new_coord,
+                    dir: i
+                });
+                break;
+            }
+
+            if (child_call) continue;
         }
 
-        return Math.min(
-            ans_lookup[hash({x: 0, y: 0})][1],
-            ans_lookup[hash({x: 0, y: 0})][2]
-        );
+        return null;
     }
 
 const test_input = `2413432311323
@@ -165,8 +124,8 @@ const test_input = `2413432311323
 
     function main(input) {
         console.log(
-            sol(input)
-            //sol(test_input)
+            //sol(input)
+            sol(test_input)
         );
     }
 
