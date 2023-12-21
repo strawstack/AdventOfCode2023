@@ -1,0 +1,106 @@
+broadcaster -> nn, lz, mj, tx
+
+%hf -> qk
+%nm -> hn
+%zb -> gz
+%cm -> fm
+%hq -> mh
+%mh -> xp
+%mq -> jd
+%tp -> hf
+%bh -> hq
+
+#
+# fz to fk solution
+#
+
+%tx -> fz, qn
+%qn -> fz, bt
+%bt -> fz, dn
+%dn -> fz, nm
+["tx", "qn", "bt", "dn"] => 15, [16, 31]
+
+%hn -> fz, xn
+%xn -> fz, kb
+%kb -> fz, cr
+%cr -> fz, fl
+%fl -> fz, rq
+%rq -> fz, fn
+%fn -> fz
+["hn", "xn", "kb", "cr", "fl", "rq", "fn"] => 4064, [1, 4065]
+
+&fz -> nm, tx, fk
+
+#
+# pn to lf solution
+#
+
+%xp -> pn, mq
+["xp"] => 64, [1, 65]
+
+%lz -> pn, vq
+%vq -> pn, qz
+%qz -> pn, bh
+["lz", "vq", "qz"] => 7, [8, 15]
+
+%jd -> pn, vx
+%vx -> pn, ds
+%ds -> pn, kz
+%kz -> pn
+["jd", "vx", "ds", "kz"] => 3840, [1, 3841]
+
+&pn -> lz, hq, mh, bh, mq, lf
+
+#
+# vd to br solution
+#
+
+%qk -> vd, zb
+["qk"] => 32, [1, 33]
+
+%nn -> vd, zc
+%zc -> ms
+%ms -> vd, tp
+["nn", "ms"] => 5, [2, 6]
+
+%gz -> vf
+%vf -> vd, nc
+%nc -> vd, sf
+%sf -> vd, xv
+%xv -> vd
+["vf", "nc", "sf", "xv"] => 3840, [1, 3841]
+
+&vd -> zc, nn, hf, zb, tp, gz, br
+
+#
+# th to rz solution
+#
+%fm -> th, hh
+%hh -> th, dq
+%dq -> th, dj 
+%dj -> th, sx
+%sx -> th, xb
+%xb -> th
+["fm", "hh", "dq", "dj", "sx", "xb"] => 4032, [1, 4033] # brackets indicate repeating pattern
+
+%np -> fq
+%fq -> xd
+%xd -> th, gp
+%gp -> th, cm
+%mj -> th, np
+["xd", "gp", "mj"] => 25, [2, 26]
+ 
+&th -> mj, np, fq, cm, rz
+
+#
+# These four must send hi to lb
+#
+&fk -> lb
+&lf -> lb
+&br -> lb
+&rz -> lb
+
+# lb sends low pulse when inputs are all high
+&lb -> rx
+
+lcm of 126015, 748995, 253506, and 104858 => 558291230438370

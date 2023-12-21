@@ -93,7 +93,9 @@
             return false;
         };
 
-        const show = mods => {
+        let prev = 0;
+        const show = (mods, btn) => {
+            /*
             const flipflop = Object.values(mods).filter(m => m.type === "%");
             const conv = Object.values(mods).filter(m => m.type === "&");
             let ff = [];
@@ -101,15 +103,43 @@
                 //ff.push(`${name}: ${(on) ? "1" : "0"}`);
                 ff.push(`${(on) ? "1" : "0"}`);
             }
-            console.log(ff.join(""));
+            console.log(ff.join("")); */
+
+            /*
+            let out = [];
+            for (let t of ["rz", "lf", "br", "fk"]) {
+                const value = !Object.values(mods[t].inputs).every(x => x);
+                out.push(`${t}: ${(value) ? "1" : "0"}`);
+            }
+            out.push("\n");
+            console.log(out.join("\n")); */
+
+            const bs = lst => {
+                let out = [];
+                for (let t of lst) {
+                    const value = mods[t].on;
+                    out.push(`${(value) ? "1" : "0"}`);
+                }
+                return out.join("");
+            };
+
+            const allOnes = value => value.indexOf("0") === -1;
+
+            //const b1 = bs(["tx", "qn", "bt", "dn"]);
+            const b1 = bs(["hn", "xn", "kb", "cr", "fl", "rq", "fn"]);
+            if (allOnes(b1)) {
+                console.log(btn - prev);
+                prev = btn;
+            }
+            
         };
 
-        let count = 10000;
+        let count = 100000;
         let btn = 0;
         while (count > 0) {
             btn += 1;
             const res = button();
-            show(mods);
+            show(mods, btn);
             if (res) break;
             count -= 1;
         }
