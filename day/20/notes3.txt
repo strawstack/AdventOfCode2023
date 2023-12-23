@@ -1,0 +1,77 @@
+BR => _ => nn, lz, mj, tx
+
+FZ 111111101111 = 4079
+
+% tx  <= fz, BR  => fz, qn
+% qn  <= tx      => fz, bt
+% bt  <= qn      => fz, dn
+% dn  <= bt      => fz, nm
+% nm  <= fz, dn  => hn
+% hn  <= nm      => fz, xn
+% xn  <= hn      => fz, kb
+% kb  <= xn      => fz, cr
+% cr  <= kb      => fz, fl
+% fl  <= cr      => fz, rq
+% rq  <= fl      => fz, fn
+% fn  <= rq      => fz
+
+VD 111100100101 = 3877
+
+% nn  <= vd, BR  => vd, zc
+% zc  <= vd, nn  => ms
+% ms  <= zc      => vd, tp
+% tp  <= vd, ms  => hf
+% hf  <= vd, tp  => qk
+% qk  <= hf      => vd, zb
+% zb  <= vd, qk  => gz
+% gz  <= vd, zb  => vf
+% vf  <= gz      => vd, nc
+% nc  <= vf      => vd, sf
+% sf  <= nc      => vd, xv
+% xv  <= sf      => vd
+
+PN 111101000111 = 3911
+
+% lz  <= pn, BR  => pn, vq
+% vq  <= lz      => pn, qz
+% qz  <= vq      => pn, bh
+% bh  <= pn, qz  => hq
+% hq  <= pn, bh  => mh
+% mh  <= pn, hq  => xp
+% xp  <= mh      => pn, mq
+% mq  <= pn, xp  => jd
+% jd  <= mq      => pn, vx
+% vx  <= jd      => pn, ds
+% ds  <= vx      => pn, kz
+% kz  <= ds      => pn
+
+TH 111111011001 = 4057
+
+% mj  <= th, BR  => th, np
+% np  <= th, mj  => fq
+% fq  <= th, np  => xd
+% xd  <= fq      => th, gp
+% gp  <= xd      => th, cm
+% cm  <= th, gp  => fm
+% fm  <= cm      => th, hh
+% hh  <= fm      => th, dq
+% dq  <= hh      => th, dj
+% dj  <= dq      => th, sx
+% sx  <= dj      => th, xb
+% xb  <= sx      => th
+
+CONV 4079, 3877, 3911, 4057
+
+& fz <= xn, hn, fl, tx, dn, rq, qn, fn, bt, cr, kb => nm, tx, fk
+& vd <= nn, vf, xv, sf, qk, ms, nc                 => zc, nn, hf, zb, tp, gz, br
+& pn <= xp, ds, qz, vx, kz, lz, jd, vq             => lz, hq, mh, bh, mq, lf
+& th <= xb, gp, mj, fm, xd, hh, sx, dq, dj         => mj, np, fq, cm, rz
+
+DONE REG
+
+& rz <= th => lb
+& lf <= pn => lb
+& br <= vd => lb
+& fk <= fz => lb
+
+& lb <= rz, lf, br, fk => rx

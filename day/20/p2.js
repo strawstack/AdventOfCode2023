@@ -20,13 +20,12 @@
             if (m.type === "%") { // flip-flop
                 m.on = false;
 
-            } else {
-                const inp = data.filter(x => x.out.includes(m.name));
-                m.inputs = {};
-                for (let i of inp) {
-                    m.inputs[i.name] = false;
-                }
             }
+            const inp = data.filter(x => x.out.includes(m.name));
+            m.inputs = {};
+            for (let i of inp) {
+                m.inputs[i.name] = false;
+            } 
             mods[m.name] = m;
         }
 
@@ -93,58 +92,73 @@
             return false;
         };
 
-        let prev = 0;
-        const show = (mods, btn) => {
-            /*
-            const flipflop = Object.values(mods).filter(m => m.type === "%");
-            const conv = Object.values(mods).filter(m => m.type === "&");
-            let ff = [];
-            for (let {name, on} of flipflop) {
-                //ff.push(`${name}: ${(on) ? "1" : "0"}`);
-                ff.push(`${(on) ? "1" : "0"}`);
+        /*
+        const show_in_out = () => {
+            let res = [];
+            res.push(
+                `broadcaster => _ => ${mods["broadcaster"].out.join(", ")}`
+            );
+            for (let m of Object.values(mods).filter(x => x.type === "%")) {
+                res.push(
+                    `% ${m.name} <= ${Object.keys(m.inputs).join(", ")} => ${m.out.join(", ")}`
+                );
             }
-            console.log(ff.join("")); */
-
-            /*
-            let out = [];
-            for (let t of ["rz", "lf", "br", "fk"]) {
-                const value = !Object.values(mods[t].inputs).every(x => x);
-                out.push(`${t}: ${(value) ? "1" : "0"}`);
+            res.push("\n");
+            for (let m of Object.values(mods).filter(x => x.type === "&")) {
+                res.push(
+                    `& ${m.name} <= ${Object.keys(m.inputs).join(", ")} => ${m.out.join(", ")}`
+                );
             }
-            out.push("\n");
-            console.log(out.join("\n")); */
+            console.log(
+                res.join("\n")
+            );
+        };
+        show_in_out(); */
 
-            const bs = lst => {
-                let out = [];
-                for (let t of lst) {
-                    const value = mods[t].on;
-                    out.push(`${(value) ? "1" : "0"}`);
-                }
-                return out.join("");
-            };
+        // Create button and input field
+        const btn = document.createElement("button");
+        btn.innerHTML = "Step";
+        btn.style.marginRight = "20px";
 
-            const allOnes = value => value.indexOf("0") === -1;
+        const inf = document.createElement("input");
+        inf.value = "1";
 
-            //const b1 = bs(["tx", "qn", "bt", "dn"]);
-            const b1 = bs(["hn", "xn", "kb", "cr", "fl", "rq", "fn"]);
-            if (allOnes(b1)) {
-                console.log(btn - prev);
-                prev = btn;
+        const show = lst => {
+            let rtn = [];
+            for (let name of lst) {
+                rtn.push(
+                    (mods[name].on) ? "1" : "0" 
+                );
             }
-            
+            console.log(`${lst.join(" ")}\n${rtn.join("  ")}\n`);
         };
 
-        let count = 100000;
-        let btn = 0;
-        while (count > 0) {
-            btn += 1;
-            const res = button();
-            show(mods, btn);
-            if (res) break;
-            count -= 1;
-        }
+        const update = () => {
+            const fz = ["tx", "qn", "bt", "dn", "nm", "hn", "xn", "kb", "cr", "fl", "rq", "fn"];
+            show(fz);
 
-        return {btn, count};
+            const vd = ["nn", "zc", "ms", "tp", "hf", "qk", "zb", "gz", "vf", "nc", "sf", "xv"];
+            show(vd);
+
+            const pn = ["lz", "vq", "qz", "bh", "hq", "mh", "xp", "mq", "jd", "vx", "ds", "kz"];
+            show(pn);
+
+            const th = ["mj", "np", "fq", "xd", "gp", "cm", "fm", "hh", "dq", "dj", "sx", "xb"];
+            show(th);
+
+            console.log("=================================================")
+        };
+
+        btn.addEventListener("click", e => {
+            const times = parseInt(inf.value, 10);
+            for (let i = 0; i < times; i++) {
+                button();
+                update();
+            }
+        });
+
+        document.body.appendChild(btn);
+        document.body.appendChild(inf);
     }
 
 const test1 = `broadcaster -> a, b, c
@@ -162,11 +176,7 @@ const test2 = `broadcaster -> a
 `;
 
     function main(input) {
-        console.log(
-            //sol(test1)
-            //sol(test2)
-            sol(input)
-        );
+        sol(input)
     }
 
     const DAY = 20;
