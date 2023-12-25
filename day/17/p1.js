@@ -69,7 +69,10 @@
     function sol(input) {
         const heap = heap_factory((a, b) => a.cost < b.cost);
         //console.log(`test: ${heap_test()}`);
-        const grid = input.trim().split("\n");
+        const grid = input.trim().split("\n")
+            .map(line => line.split("")
+                .map(x => parseInt(x))
+            );
         const MAX_COUNT = 2;
         const directions = [
             {x: 0, y: -1},
@@ -88,6 +91,15 @@
                 y: a.y + b.y
             };
         };
+        const add2 = (a, b) => {
+            return add(add(a, b), b);
+        };
+        const add3 = (a, b) => {
+            return add(add(add(a, b), b), b);
+        };
+        const add_look = [
+            add, add2, add3
+        ];
 
         const hash = state => JSON.stringify(state);
 
@@ -105,46 +117,50 @@
         heap.add({
             coord: {x: 0, y: 0},
             dir: 1,
-            count: MAX_COUNT + 1 // If count === 0 then you have to turn
+            count: MAX_COUNT + 1,
+            cost: 0
         });
 
         const visited = {};
+        const target = {x: grid[0].length - 1, y: grid.length - 1};
         while (heap.size() > 0) {
-            const {coord, dir, count} = heap.pop();
+            const {coord, dir, count, cost} = heap.pop();
+            const cdir = directions[dir];
             
+            // End goal
+            if (eq(coord, target)) return cost;
+
+            if (!inBounds(coord)) continue;
             const hh = hash({coord, dir, count});
             if (hh in visited) continue;
             visited[hh] = true;
 
             for (let d = 0; d < directions.length; d++) {
                 const delta = directions[d];
-                if (opp(dir, delta)) continue;
-                if (eq(dir, delta)) {
-                    if (count === 2) {
+                if (opp(cdir, delta)) continue;
+                if (eq(cdir, delta)) {
+                    if (count > 0) {
+                        const nc  = add(coord, cdir);
+                        if (!inBounds(nc)) continue;
                         heap.add({
-                            coord: add(coord, dir),
-                            dir, count: 1
-                        });
-                        heap.add({
-                            coord: add(add(coord, dir), dir),
-                            dir, count: 0
-                        });
-                    } else if (count === 1) {
-                        heap.add({
-                            coord: add(coord, dir),
-                            dir, count: 0
+                            coord: nc,
+                            dir: d, count: count - 1,
+                            cost: cost + grid[nc.y][nc.x]
                         });
                     }
                 } else {
-
-                    // TODO: advance in the two other directions
-                    // TODO: Calculate the cost of getting to a node
-
+                    const nc = add(coord, delta);
+                    if (!inBounds(nc)) continue;
+                    heap.add({
+                        coord: nc,
+                        dir: d, count: MAX_COUNT,
+                        cost: cost + grid[nc.y][nc.x]
+                    });
                 }
             }
         }
 
-        return grid;
+        throw new Error("Should not hit");
     }
 
     function main(input) {
